@@ -28,6 +28,13 @@ function App() {
   const [loadingFile, setLoadingFile] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [compiler, setCompiler] = useState("pdflatex");
+  const [apiKey, setApiKey] = useState(() => {
+    try {
+      return window.sessionStorage.getItem("pressa:api-key") || "";
+    } catch {
+      return "";
+    }
+  });
   const [isCompiling, setIsCompiling] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
   const [compileOutput, setCompileOutput] = useState("");
@@ -97,6 +104,27 @@ function App() {
     setShowLog(false);
     setCompileState({ type: "idle", message: "Ready to compile" });
   }, [activeId]);
+
+  function manageApiKey() {
+    if (apiKey) {
+      try { window.sessionStorage.removeItem("pressa:api-key"); } catch { /* session storage unavailable */ }
+      setApiKey("");
+      setCompileState({ type: "idle", message: "Pressa API key cleared from this tab" });
+      return;
+    }
+
+    const entered = window.prompt("Enter your Pressa API key. It will be kept only in this browser tab session.");
+    if (!entered || !entered.trim()) return;
+    const cleanKey = entered.trim();
+    try {
+      window.sessionStorage.setItem("pressa:api-key", cleanKey);
+    } catch {
+      setCompileState({ type: "warning", message: "Browser session storage is unavailable; key was not saved." });
+      return;
+    }
+    setApiKey(cleanKey);
+    setCompileState({ type: "success", message: "Pressa API key stored for this tab session" });
+  }
 
   function saveDraft() {
     try {
@@ -218,6 +246,7 @@ function App() {
             <span /> {isDirty ? "Unsaved changes" : "Saved in browser"}
           </span>
           <button className="tool-button subtle" onClick={saveDraft} disabled={!source || loadingFile}>Save</button>
+          <button className="tool-button subtle" onClick={manageApiKey}>{apiKey ? "Clear API key" : "Set API key"}</button>
           <button className="tool-button subtle" onClick={downloadSource} disabled={!source || loadingFile}>Download .tex</button>
           <button className="compile-button" onClick={compileSource} disabled={!source || loadingFile || isCompiling}>
             {isCompiling ? <span className="spinner" /> : <span className="play-icon">▶</span>}
@@ -240,7 +269,11 @@ function App() {
               <button
                 key={file.id}
                 className={"file-item " + (activeId === file.id ? "active" : "")}
-                onClick={() => setActiveId(file.id)}
+                onClick={() => {
+                  setActiveId(file.id);
+                  setLoadError("");
+                  setLoadingFile(!loadedFiles[file.id]);
+                }}
                 title={file.description}
               >
                 <span className="tex-icon">TEX</span>
