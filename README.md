@@ -49,6 +49,7 @@ GitHub Pages must use **GitHub Actions** as its build and deployment source in r
 - Compilation sends the current editor contents to Pressa's POST /api/v1/compile endpoint. Unsaved edits are therefore compiled too.
 - Pressa is a third-party service. Its API has anonymous usage, source-size, page-count, and output-size limits. Check its current [API documentation](https://pressa.dev/docs/api) for details.
 - Browser drafts are stored in localStorage on the current browser/device. They are not synced to GitHub or another device.
+- If Pressa requires authentication for your account, use **Set API key** in the top bar. The key is kept only in sessionStorage for the current tab and sent as a Bearer token; it is not committed to this repository.
 - The React app is static-hosted. It does not provide authentication, cloud projects, multi-user collaboration, or server-side storage yet.
 - Do not enter confidential documents or secrets into this public app. LaTeX source is sent to the hosted compiler.
 - PDF URLs returned by Pressa are temporary signed links.
