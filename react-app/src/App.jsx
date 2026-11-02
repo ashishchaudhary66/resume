@@ -179,7 +179,7 @@ function App() {
     try {
       const response = await fetch("https://api.pressa.dev/api/v1/compile", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(apiKey ? { Authorization: "Bearer " + apiKey } : {}) },
         body: JSON.stringify({ latex: source, compiler: compiler })
       });
 
