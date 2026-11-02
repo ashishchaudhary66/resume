@@ -1,6 +1,6 @@
 # Ashish Kumar Chaudhary — Resume Collection
 
-This repository contains three ATS-friendly, one-page LaTeX resume variants.
+This repository contains three ATS-friendly LaTeX resume variants and a web app to compile a selected variant into PDF.
 
 ## Resume versions
 
@@ -10,9 +10,29 @@ This repository contains three ATS-friendly, one-page LaTeX resume variants.
 | [React + .NET Full Stack](resumes/React_DotNet_FullStack.tex) | React + .NET Full Stack Developer | React, Hooks, Redux Toolkit, TypeScript, ASP.NET Core, C#, SQL Server |
 | [React + Angular + .NET Full Stack](resumes/React_Angular_DotNet_FullStack.tex) | General Full Stack Developer | Balanced React, Angular, ASP.NET Core, databases, and Azure |
 
-## Compile
+## LaTeX to PDF web app
 
-Open any `.tex` file in Overleaf or compile it locally with pdfLaTeX.
+The static web app is in the [app](app/) folder. It lets you select one of the three resume sources, send it to the Pressa hosted LaTeX compiler, preview the generated PDF, and open the PDF in a new tab.
+
+### Run locally
+
+Open app/index.html in a browser, or serve the repository root with any static file server and visit /app/.
+
+### Publish with GitHub Pages
+
+The workflow at .github/workflows/deploy-resume-app.yml deploys the contents of app/ to GitHub Pages when changes are pushed to main.
+
+After the first successful workflow run and enabling GitHub Pages with GitHub Actions as the build source in repository Settings → Pages, the app will be available at:
+
+https://ashishchaudhary66.github.io/resume/
+
+### Compilation notes
+
+- The app loads the selected .tex file from this public GitHub repository and uses Pressa's online compiler (api.pressa.dev) with pdfLaTeX.
+- The compiler returns the PDF directly; the app embeds that response in a preview and provides an open-in-new-tab link.
+- This is a third-party service with usage limits. The LaTeX source is public and is sent to the compiler, so do not use this app for confidential source files.
+- Generated PDFs are created on demand and are not committed to GitHub.
+- You can also compile locally with a TeX Live installation or upload a .tex file to Overleaf.
 
 ## Notes
 
