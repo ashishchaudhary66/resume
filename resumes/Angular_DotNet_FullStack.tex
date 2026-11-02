@@ -1,69 +1,157 @@
+%-------------------------
+% Resume - Full Stack Developer
+%-------------------------
+
 \documentclass[a4paper,9pt]{article}
-\usepackage[margin=0.48in]{geometry}
-\usepackage[T1]{fontenc}
-\usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{xcolor}
+
 \usepackage[hidelinks]{hyperref}
-\usepackage{tabularx}
 \usepackage{latexsym}
-\pagestyle{empty}
-\setlength{\parindent}{0pt}
-\setlength{\tabcolsep}{0pt}
-\setlist[itemize]{leftmargin=*,nosep,topsep=1pt}
-\titleformat{\section}{\large\bfseries\color{blue}}{}{0em}{}[\titlerule]
-\titlespacing*{\section}{0pt}{5pt}{3pt}
-\newcommand{\resumeSubheading}[4]{\textbf{#1}\hfill #2\\\textit{#3}\hfill\textit{#4}\\}
-\newcommand{\skill}[2]{\textbf{#1:} #2\\}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{enumitem}
+\usepackage{tabularx}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.55in}
+\addtolength{\evensidemargin}{-0.35in}
+\addtolength{\textwidth}{0.95in}
+\addtolength{\topmargin}{-0.65in}
+\addtolength{\textheight}{1.25in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-7pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Custom commands
+\newcommand{\resumeItem}[2]{
+  \item\small{\textbf{#1}: #2 \vspace{-2pt}}
+}
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+  \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+    \textbf{#1} & #2 \\
+    \textit{#3} & \textit{#4} \\
+  \end{tabular*}\vspace{-5pt}
+}
+\newcommand{\resumeSubItem}[2]{
+  \item\small{\textbf{#1}: #2 \vspace{-3pt}}
+}
+\newcommand{\resumeSubHeadingListStart}{
+  \begin{itemize}[leftmargin=*,itemsep=1pt,topsep=2pt]
+}
+\newcommand{\resumeSubHeadingListEnd}{
+  \end{itemize}\vspace{-3pt}
+}
+\newcommand{\resumeItemListStart}{
+  \begin{itemize}[leftmargin=15pt,itemsep=1pt,topsep=2pt]
+}
+\newcommand{\resumeItemListEnd}{
+  \end{itemize}\vspace{-5pt}
+}
+\renewcommand{\labelitemii}{$\circ$}
+
 \begin{document}
-\begin{center}
-{\LARGE\textbf{Ashish Kumar Chaudhary}}\\[-1pt]
-+91 6388340458 \;|\; \href{mailto:ashishkumarchaudhary66@gmail.com}{ashishkumarchaudhary66@gmail.com}\\
-\href{https://www.linkedin.com/in/ashish-kumar-chaudhary-265408254/}{LinkedIn} \;|\;
-\href{https://github.com/ashishchaudhary66}{GitHub}
-\end{center}
-\section{Professional Summary}
-Full Stack Developer with 2+ years of experience building enterprise applications, specializing in Angular and .NET. Hands-on experience with Angular, TypeScript, Signals, RxJS, Reactive Forms, Angular Material, C\#, ASP.NET Core, REST APIs, SQL Server, and Azure.
-\section{Professional Experience}
-\resumeSubheading{Nagarro}{Gurgaon}{Associate Engineer}{Sep 2025 -- Present}
-\begin{itemize}
-\item Develop enterprise application features using C\#, ASP.NET Core Web APIs, Clean Architecture, dependency injection, service/repository patterns, EF Core, LINQ, FluentValidation, and asynchronous programming.
-\item Build responsive, data-driven frontend workflows with TypeScript, forms, tables, filtering, validation, and privilege-based UI behavior.
-\item Work with SQL Server and Azure services for application integration, deployment, messaging, storage, and monitoring.
-\item Write unit tests with xUnit and Moq, achieving 95\% coverage in targeted feature areas; participate in code reviews, defect fixes, and deployment support.
-\end{itemize}
-\resumeSubheading{Sohan Lal Commodity Management}{New Delhi}{Associate Software Developer}{Dec 2024 -- Aug 2025}
-\begin{itemize}
-\item Developed and maintained business features using C\#, ASP.NET Web Forms, ADO.NET, and SQL Server.
-\item Integrated Google Maps and automated email notifications using SQL triggers and SQL Server Agent.
-\item Implemented document image recognition and data extraction using Gemini 1.5 Flash, reducing manual processing effort by 40\%.
-\end{itemize}
-\resumeSubheading{CNH Industrial}{Gurugram}{Software Engineer Intern}{Jan 2024 -- Nov 2024}
-\begin{itemize}
-\item Contributed to an enterprise admin platform built with micro-frontend architecture, integrating frontend modules with ASP.NET Core APIs.
-\item Developed UI workflows, REST API integrations, backend endpoints, validation, and SQL-backed business functionality.
-\item Supported application deployment and monitoring using Azure services including App Service, Blob Storage, Service Bus, Azure Monitor, and API Management.
-\end{itemize}
-\section{Technical Skills}
-\skill{Frontend}{Angular, TypeScript, Signals, RxJS, Reactive Forms, Angular Material, HTML5, CSS3, JavaScript}
-\skill{Backend}{C\#, ASP.NET Core, ASP.NET Web API, REST APIs, EF Core, LINQ, ADO.NET, Clean Architecture, FluentValidation}
-\skill{Databases}{SQL Server, PostgreSQL, MySQL, MongoDB, Stored Procedures}
-\skill{Cloud \& Tools}{Azure App Service, Blob Storage, Service Bus, Event Grid, Azure Monitor, Azure DevOps, Git, Swagger, Postman}
-\skill{Testing \& Practices}{xUnit, Moq, Jasmine, Karma, Unit Testing, SOLID, OOP, Dependency Injection, Repository Pattern, CI/CD}
-\section{Projects}
-\textbf{Real-Time Multiplayer Quiz Game} \;|\; React, Node.js, Express.js, Socket.IO
-\begin{itemize}
-\item Built a room-based multiplayer quiz game with host-controlled questions, real-time player updates, scoring, and a live leaderboard.
-\end{itemize}
-\textbf{Smart Shopping} \;|\; React, Node.js, MongoDB, Redux Toolkit
-\begin{itemize}
-\item Developed shopping workflows including authentication, product browsing, cart, wishlist, checkout, and transaction history using JWT-based authentication and REST APIs.
-\end{itemize}
-\section{Education}
-\textbf{Jamia Millia Islamia}, New Delhi \hfill Aug 2022 -- May 2024\\
-Master of Computer Applications (MCA) \hfill CGPA: 9.06\\
-\textbf{Chandigarh University}, Punjab \hfill Jun 2018 -- Aug 2021\\
-Bachelor of Computer Applications (BCA) \hfill CGPA: 7.67
-\section{Certifications}
-Microsoft Certified: Azure Fundamentals (Oct 2024) \;|\; DSA with Java, Apna College (Dec 2023)
+
+%----------HEADING-----------------
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+  \textbf{{\LARGE \color{Blue} Ashish Kumar Chaudhary}} &
+  Email: \href{mailto:ashishkumarchaudhary66@gmail.com}{ashishkumarchaudhary66@gmail.com} \\
+  \href{https://www.linkedin.com/in/ashish-kumar-chaudhary-265408254/}{LinkedIn: ashish-kumar-chaudhary} &
+  Mobile: +91 6388340458 \\
+  \href{https://github.com/ashishchaudhary66}{GitHub: github.com/ashishchaudhary66} &
+\end{tabular*}
+
+%-----------SUMMARY-----------------
+\section{\color{BlueViolet} Professional Summary}
+\small{Full Stack Developer with 2+ years of experience building enterprise web applications using Angular, TypeScript, C#, ASP.NET Core, and SQL Server. Experienced in developing reusable Angular components, building forms and data-driven interfaces, integrating REST APIs, and developing backend services using Clean Architecture and Entity Framework Core. Hands-on experience with React and Microsoft Azure.}
+
+%-----------SKILLS-----------------
+\section{\color{BlueViolet} Technical Skills}
+\resumeSubHeadingListStart
+\resumeSubItem{\color{Blue} Languages}{C\#, JavaScript, TypeScript, SQL, Java, Python, HTML, CSS}
+\resumeSubItem{\color{Blue} Frontend}{Angular, TypeScript, Signals, RxJS, Reactive Forms, Angular Material, React.js, Functional Components, React Hooks, Redux Toolkit, JavaScript}
+\resumeSubItem{\color{Blue} Backend}{ASP.NET Core, .NET 10, ASP.NET Web API, REST APIs, Entity Framework Core, LINQ, ADO.NET, Clean Architecture, FluentValidation, Dependency Injection}
+\resumeSubItem{\color{Blue} Databases}{SQL Server, PostgreSQL, MySQL, MongoDB, Stored Procedures, Query Optimization}
+\resumeSubItem{\color{Blue} Cloud \& DevOps}{Microsoft Azure, App Service, Blob Storage, Service Bus, Event Grid, Azure DevOps, CI/CD, Git, Docker}
+\resumeSubItem{\color{Blue} Tools \& Testing}{Visual Studio, VS Code, Postman, Swagger, SonarQube, xUnit, Moq, Jasmine, Karma, Unit Testing}
+\resumeSubItem{\color{Blue} Concepts}{OOP, SOLID, Repository Pattern, Async/Await, Microservices, JWT Authentication, Agile/Scrum}
+\resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------------
+\section{\color{BlueViolet} Experience}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{\color{Blue} Nagarro}{Gurgaon, India}
+{Associate Engineer}{Sep 2025 -- Present}
+\resumeItemListStart
+\resumeItem{Backend Development}
+{Developing RESTful APIs using C\#, ASP.NET Core, Clean Architecture, Dependency Injection, EF Core, LINQ, and FluentValidation.}
+\resumeItem{Frontend Development}
+{Building enterprise frontend workflows using TypeScript, reusable components, forms, data tables, filtering, validation, and privilege-based UI behavior.}
+\resumeItem{Testing \& Azure}
+{Writing xUnit/Moq and frontend unit tests, achieving 95\% coverage in targeted feature areas; supporting Azure-based deployments and application troubleshooting.}
+\resumeItemListEnd
+
+\resumeSubheading
+{\color{Blue} Sohan Lal Commodity Management}{New Delhi, India}
+{Associate Software Developer}{Dec 2024 -- Aug 2025}
+\resumeItemListStart
+\resumeItem{Application Development}
+{Developed business applications using C\#, ASP.NET Web Forms, ADO.NET, and SQL Server; integrated Google Maps and automated email notifications using SQL Triggers and SQL Server Agent.}
+\resumeItem{AI Integration}
+{Integrated Gemini 1.5 Flash for scanned-document image recognition and data extraction, reducing manual processing effort by 40\%.}
+\resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------INTERNSHIP-----------------
+\section{\color{BlueViolet} Internship}
+\resumeSubHeadingListStart
+\resumeSubheading
+{\color{Blue} CNH Industrial}{Gurugram, India}
+{Software Engineer Intern}{Jan 2024 -- Nov 2024}
+\resumeItemListStart
+\resumeItem{Frontend Development}
+{Developed an enterprise admin dashboard using React and TypeScript, building reusable functional components, managing UI state with React Hooks, and integrating REST APIs for interactive forms, tables, and administrative workflows.}
+\resumeItem{.NET Backend Development}
+{Developed backend functionality using ASP.NET Core Web API and C\#, implementing REST endpoints, request validation, and service-layer business logic.}
+\resumeItem{Database \& Azure}
+{Integrated SQL Server and PostgreSQL; worked with micro-frontend architecture and Azure App Service, Blob Storage, Service Bus, Azure Monitor, and API Management.}
+\resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------------
+\section{\color{BlueViolet} Projects}
+\resumeSubHeadingListStart
+\resumeSubItem{\color{Blue} Smart Shopping -- E-Commerce Application}
+{Built a full-stack e-commerce application with secure JWT authentication, dynamic shopping cart, wishlist, checkout, and transaction history. Implemented frontend state management and REST API integration. Tech: React.js, Redux Toolkit, Node.js, Express.js, MongoDB, JWT, Tailwind CSS.}
+\resumeSubItem{\color{Blue} Real-Time Multiplayer Quiz Game}
+{Developed a multiplayer game with room-based joining, admin-controlled questions, real-time score updates, and live leaderboards using WebSockets. Tech: React.js, Node.js, Express.js, Socket.IO, REST APIs.}
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------------
+\section{\color{BlueViolet} Education}
+\resumeSubHeadingListStart
+\resumeSubheading
+{\color{Blue} Jamia Millia Islamia}{New Delhi, India}
+{Master of Computer Applications; CGPA: 9.06}{Aug 2022 -- May 2024}
+\resumeSubheading
+{\color{Blue} Chandigarh University}{Punjab, India}
+{Bachelor of Computer Applications; CGPA: 7.67}{Jun 2018 -- Aug 2021}
+\resumeSubHeadingListEnd
+
+%-----------CERTIFICATIONS-----------------
+\section{\color{BlueViolet} Certifications}
+\resumeSubHeadingListStart
+\resumeSubItem{\color{Blue} Microsoft Certified}{Azure Fundamentals (Oct 2024)}
+\resumeSubItem{\color{Blue} DSA with Java}{Apna College (Dec 2023)}
+\resumeSubHeadingListEnd
+
 \end{document}
