@@ -203,7 +203,7 @@ function App() {
     setCompileState({ type: "compiling", message: "Sending source to compiler proxy…" });
 
     try {
-      const baseUrl = compilerProxyUrl.replace(/\\/+$/, "");
+      const baseUrl = compilerProxyUrl.replace(/\/+$/, "");
       const compileUrl = baseUrl.endsWith("/compile") ? baseUrl : baseUrl + "/compile";
       const response = await fetch(compileUrl, {
         method: "POST",
