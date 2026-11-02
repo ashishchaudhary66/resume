@@ -34,12 +34,12 @@ export default {
     const origin = request.headers.get("Origin") || "";
 
     // Public, read-only health check for opening the Worker URL directly.
-    // Compilation itself remains restricted to the allowlisted app origins.
     if (url.pathname === "/" && request.method === "GET") {
       return new Response(JSON.stringify({
         ok: true,
         service: "Resume Lab compiler proxy",
         endpoint: "/compile",
+        pdfEndpoint: "/pdf",
         allowedAppOrigin: "https://ashishchaudhary66.github.io"
       }), {
         status: 200,
@@ -48,6 +48,54 @@ export default {
           "Cache-Control": "no-store"
         }
       });
+    }
+
+    // Pressa's signed PDF endpoint may disallow iframe embedding. Fetch it
+    // server-to-server and return it from this Worker without upstream frame headers.
+    if (url.pathname === "/pdf" && request.method === "GET") {
+      const signedSource = url.searchParams.get("source");
+      let pdfUrl;
+
+      try {
+        pdfUrl = new URL(signedSource || "");
+      } catch {
+        return new Response("A valid signed PDF source URL is required.", { status: 400 });
+      }
+
+      const validPdfUrl =
+        pdfUrl.protocol === "https:" &&
+        pdfUrl.hostname === "api.pressa.dev" &&
+        /^\\/api\\/v1\\/pdfs\\/[a-zA-Z0-9_-]+$/.test(pdfUrl.pathname) &&
+        pdfUrl.searchParams.has("sig") &&
+        pdfUrl.searchParams.has("exp");
+
+      if (!validPdfUrl) {
+        return new Response("The PDF source URL is not an approved Pressa signed PDF URL.", { status: 400 });
+      }
+
+      try {
+        const upstreamPdf = await fetch(pdfUrl.toString(), { method: "GET" });
+        if (!upstreamPdf.ok) {
+          const message = await upstreamPdf.text();
+          return new Response(message || "Pressa could not return the compiled PDF.", {
+            status: upstreamPdf.status,
+            headers: { "Content-Type": upstreamPdf.headers.get("Content-Type") || "text/plain; charset=utf-8" }
+          });
+        }
+
+        return new Response(upstreamPdf.body, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": 'inline; filename="resume.pdf"',
+            "Cache-Control": "private, max-age=300",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "frame-ancestors https://ashishchaudhary66.github.io http://localhost:5173 http://127.0.0.1:5173"
+          }
+        });
+      } catch {
+        return new Response("Could not retrieve the compiled PDF from Pressa.", { status: 502 });
+      }
     }
 
     if (!ALLOWED_ORIGINS.has(origin)) {
@@ -114,11 +162,42 @@ export default {
       });
 
       const responseBody = await upstream.text();
-      return new Response(responseBody, {
+      let responseText = responseBody;
+      const contentType = upstream.headers.get("Content-Type") || "application/json; charset=utf-8";
+
+      if (upstream.ok && contentType.includes("application/json")) {
+        try {
+          const result = JSON.parse(responseBody);
+          if (typeof result.pdf_url === "string") {
+            const signedPdfUrl = new URL(result.pdf_url);
+            const validPdfUrl =
+              signedPdfUrl.protocol === "https:" &&
+              signedPdfUrl.hostname === "api.pressa.dev" &&
+              /^\\/api\\/v1\\/pdfs\\/[a-zA-Z0-9_-]+$/.test(signedPdfUrl.pathname) &&
+              signedPdfUrl.searchParams.has("sig") &&
+              signedPdfUrl.searchParams.has("exp");
+
+            if (!validPdfUrl) {
+              return jsonResponse({
+                error: "invalid_pdf_url",
+                message: "Pressa returned a PDF URL outside the approved signed PDF endpoint."
+              }, 502, origin);
+            }
+
+            result.pdf_url = url.origin + "/pdf?source=" + encodeURIComponent(signedPdfUrl.toString());
+            responseText = JSON.stringify(result);
+          }
+        } catch (error) {
+          if (error instanceof TypeError) throw error;
+          // Preserve the original compiler response if it is not the expected JSON shape.
+        }
+      }
+
+      return new Response(responseText, {
         status: upstream.status,
         headers: {
           ...corsHeaders(origin),
-          "Content-Type": upstream.headers.get("Content-Type") || "application/json; charset=utf-8",
+          "Content-Type": contentType,
           "Cache-Control": "no-store"
         }
       });
