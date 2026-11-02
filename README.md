@@ -12,13 +12,7 @@ This repository contains three ATS-friendly LaTeX resume variants and **Resume L
 
 ## Resume Lab — React LaTeX workspace
 
-The React application is in [react-app](react-app/). It provides:
-
-- Three selectable resume source files in a project/file sidebar.
-- A LaTeX editor powered by CodeMirror with line numbers, syntax highlighting, and editor shortcuts.
-- Browser-local draft saving, reset-to-repository-source, and TEX download.
-- pdfLaTeX / XeLaTeX compiler selection and an in-app PDF preview with an open-in-new-tab fallback.
-- Compiler error output when Pressa returns a LaTeX or service error.
+The React application is in [react-app](react-app/). It provides a three-file project explorer, a CodeMirror LaTeX editor, browser-local drafts, reset/download controls, compiler selection, PDF preview, and compiler logs.
 
 ### Run locally
 
@@ -28,34 +22,45 @@ Requires Node.js 22.12 or newer.
     npm install
     npm run dev
 
-Open the local URL printed by Vite (the base path is /resume/). The predev script copies the three repository TEX files into the app's public templates folder.
+Open the Vite URL printed in the terminal. The app copies the three repository resume sources into its public templates folder before starting.
 
-Create a production build with:
+### Publish the frontend with GitHub Pages
 
-    npm run build
+The workflow at `.github/workflows/deploy-resume-app.yml` builds `react-app` and deploys `react-app/dist`.
 
-### Publish with GitHub Pages
-
-The workflow at .github/workflows/deploy-resume-app.yml builds react-app and deploys react-app/dist when the React app, resume sources, or workflow changes are pushed to main.
-
-The app URL is:
+App URL:
 
 https://ashishchaudhary66.github.io/resume/
 
-GitHub Pages must use **GitHub Actions** as its build and deployment source in repository Settings → Pages.
+GitHub Pages must use **GitHub Actions** as its build source in repository Settings → Pages.
 
-### Compiler and storage notes
+## Compiler proxy — required for browser compilation
 
-- Compilation sends the current editor contents to Pressa's POST /api/v1/compile endpoint. Unsaved edits are therefore compiled too.
-- Pressa is a third-party service. Its API has anonymous usage, source-size, page-count, and output-size limits. Check its current [API documentation](https://pressa.dev/docs/api) for details.
-- Browser drafts are stored in localStorage on the current browser/device. They are not synced to GitHub or another device.
-- If Pressa requires authentication for your account, use **Set API key** in the top bar. The key is kept only in sessionStorage for the current tab and sent as a Bearer token; it is not committed to this repository.
-- The React app is static-hosted. It does not provide authentication, cloud projects, multi-user collaboration, or server-side storage yet.
-- Do not enter confidential documents or secrets into this public app. LaTeX source is sent to the hosted compiler.
-- PDF URLs returned by Pressa are temporary signed links.
+Pressa's compile API does not currently return the CORS headers required by a browser hosted on GitHub Pages. The browser therefore cannot call Pressa directly. Resume Lab uses a small Cloudflare Worker as a server-side proxy. The Worker answers the browser's `OPTIONS` preflight with the correct CORS headers, then makes the Pressa request server-to-server.
+
+### Deploy the proxy
+
+1. Create or sign in to a Cloudflare account and enable Workers.
+2. In GitHub, open this repository's **Settings → Secrets and variables → Actions**.
+3. Add `CLOUDFLARE_API_TOKEN` (an API token with permission to edit Workers Scripts for the account) and `CLOUDFLARE_ACCOUNT_ID`.
+4. Push a change under `worker/` or manually run **Deploy Resume Lab compiler proxy** from the Actions tab. The workflow deploys `worker/src/index.js` using `worker/wrangler.jsonc`.
+5. In Cloudflare, confirm that the Worker `resume-lab-compiler` has a `workers.dev` URL enabled. It will look like `https://resume-lab-compiler.<your-workers-subdomain>.workers.dev`.
+6. Open Resume Lab, click **Set proxy URL**, and paste the Worker URL. The setting is saved in localStorage for that browser.
+
+The Worker allows the GitHub Pages origin `https://ashishchaudhary66.github.io` and Vite's default local development origins. It accepts only `POST /compile`, validates the compiler name, and enforces a 30 KB source limit to match Pressa's anonymous tier.
+
+### Pressa authentication and limits
+
+Pressa's current compile API supports anonymous compilation without an API key (three successful compilations per day). If you obtain a Pressa key, configure it as a **Worker secret** named `PRESSA_API_KEY` in Cloudflare. It is never sent to or stored by the browser. See the [Pressa API docs](https://pressa.dev/docs/api).
+
+### Storage and security notes
+
+- Drafts and the compiler proxy URL are stored in localStorage on the current browser/device. They are not synced between devices.
+- The React frontend is static. It does not yet provide accounts, cloud projects, project sharing, collaboration, or server-side draft storage.
+- The LaTeX source is sent to Pressa for compilation. Do not enter confidential documents or secrets.
+- Pressa returns a temporary signed PDF URL. The PDF can be opened in a new tab if the embedded preview is unavailable.
 
 ## Notes
 
 - Keep dates, contact details, metrics, and technology claims aligned with verified employment history.
-- The source files use a compact A4 layout intended to fit on one page. Confirm the final page count after compiling.
-- Update the relevant variant rather than sending the same resume to every role.
+- Confirm the final page count and layout after compiling each resume variant.

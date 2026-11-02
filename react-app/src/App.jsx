@@ -28,11 +28,12 @@ function App() {
   const [loadingFile, setLoadingFile] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [compiler, setCompiler] = useState("pdflatex");
-  const [apiKey, setApiKey] = useState(() => {
+  const [compilerProxyUrl, setCompilerProxyUrl] = useState(() => {
     try {
-      return window.sessionStorage.getItem("pressa:api-key") || "";
+      return window.localStorage.getItem("resume-lab:compiler-proxy-url") ||
+        import.meta.env.VITE_COMPILER_PROXY_URL || "";
     } catch {
-      return "";
+      return import.meta.env.VITE_COMPILER_PROXY_URL || "";
     }
   });
   const [isCompiling, setIsCompiling] = useState(false);
@@ -105,25 +106,43 @@ function App() {
     setCompileState({ type: "idle", message: "Ready to compile" });
   }, [activeId]);
 
-  function manageApiKey() {
-    if (apiKey) {
-      try { window.sessionStorage.removeItem("pressa:api-key"); } catch { /* session storage unavailable */ }
-      setApiKey("");
-      setCompileState({ type: "idle", message: "Pressa API key cleared from this tab" });
+  function configureCompilerProxy() {
+    const entered = window.prompt(
+      "Paste your Cloudflare Worker URL. Example: https://resume-lab-compiler.YOUR-SUBDOMAIN.workers.dev",
+      compilerProxyUrl
+    );
+    if (entered === null) return;
+
+    const value = entered.trim().replace(/\\/+$/, "");
+    if (!value) {
+      try { window.localStorage.removeItem("resume-lab:compiler-proxy-url"); } catch { /* storage unavailable */ }
+      setCompilerProxyUrl("");
+      setCompileState({ type: "warning", message: "Compiler proxy URL cleared." });
       return;
     }
 
-    const entered = window.prompt("Enter your Pressa API key. It will be kept only in this browser tab session.");
-    if (!entered || !entered.trim()) return;
-    const cleanKey = entered.trim();
+    let parsed;
     try {
-      window.sessionStorage.setItem("pressa:api-key", cleanKey);
+      parsed = new URL(value);
     } catch {
-      setCompileState({ type: "warning", message: "Browser session storage is unavailable; key was not saved." });
+      setCompileState({ type: "error", message: "Enter a valid HTTPS Worker URL." });
       return;
     }
-    setApiKey(cleanKey);
-    setCompileState({ type: "success", message: "Pressa API key stored for this tab session" });
+
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) {
+      setCompileState({ type: "error", message: "The compiler proxy must be a public HTTPS URL." });
+      return;
+    }
+
+    const normalized = parsed.origin + parsed.pathname.replace(/\\/+$/, "");
+    try {
+      window.localStorage.setItem("resume-lab:compiler-proxy-url", normalized);
+    } catch {
+      setCompileState({ type: "warning", message: "Could not save the proxy URL in this browser." });
+      return;
+    }
+    setCompilerProxyUrl(normalized);
+    setCompileState({ type: "success", message: "Compiler proxy configured for this browser." });
   }
 
   function saveDraft() {
@@ -170,16 +189,25 @@ function App() {
       return;
     }
 
+    if (!compilerProxyUrl) {
+      setCompileOutput("The compiler proxy is not configured yet. Deploy the Cloudflare Worker from worker/ and then use Set proxy URL in the top bar.");
+      setShowLog(true);
+      setCompileState({ type: "warning", message: "Set the compiler proxy URL first." });
+      return;
+    }
+
     setIsCompiling(true);
     setPdfUrl("");
     setCompileOutput("");
     setShowLog(false);
-    setCompileState({ type: "compiling", message: "Sending source to Pressa…" });
+    setCompileState({ type: "compiling", message: "Sending source to compiler proxy…" });
 
     try {
-      const response = await fetch("https://api.pressa.dev/api/v1/compile", {
+      const baseUrl = compilerProxyUrl.replace(/\\/+$/, "");
+      const compileUrl = baseUrl.endsWith("/compile") ? baseUrl : baseUrl + "/compile";
+      const response = await fetch(compileUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...(apiKey ? { Authorization: "Bearer " + apiKey } : {}) },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ latex: source, compiler: compiler })
       });
 
@@ -220,7 +248,7 @@ function App() {
     } catch (error) {
       const isNetworkError = error instanceof TypeError;
       const message = isNetworkError
-        ? "The browser could not reach Pressa. Check the connection and browser console. A browser CORS restriction may require a small backend proxy."
+        ? "The browser could not reach your Worker proxy. Check the Worker URL, deployment status, and CORS allowlist."
         : (error.message || "Unexpected compilation error.");
       setCompileOutput(message);
       setShowLog(true);
@@ -239,14 +267,14 @@ function App() {
             <strong>Resume Lab</strong>
             <span>LaTeX workspace <i>/</i> personal-resumes</span>
           </div>
-          <span className="cloud-pill"><span className="cloud-dot" /> LOCAL DRAFTS</span>
+          <span className="cloud-pill"><span className="cloud-dot" /> {compilerProxyUrl ? "PROXY CONNECTED" : "PROXY NOT SET"}</span>
         </div>
         <div className="top-actions">
           <span className={"save-indicator " + (isDirty ? "is-dirty" : "")}>
             <span /> {isDirty ? "Unsaved changes" : "Saved in browser"}
           </span>
           <button className="tool-button subtle" onClick={saveDraft} disabled={!source || loadingFile}>Save</button>
-          <button className="tool-button subtle" onClick={manageApiKey}>{apiKey ? "Clear API key" : "Set API key"}</button>
+          <button className="tool-button subtle" onClick={configureCompilerProxy}>{compilerProxyUrl ? "Change proxy" : "Set proxy URL"}</button>
           <button className="tool-button subtle" onClick={downloadSource} disabled={!source || loadingFile}>Download .tex</button>
           <button className="compile-button" onClick={compileSource} disabled={!source || loadingFile || isCompiling}>
             {isCompiling ? <span className="spinner" /> : <span className="play-icon">▶</span>}
