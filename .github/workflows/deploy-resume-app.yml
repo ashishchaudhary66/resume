@@ -1,10 +1,10 @@
-name: Deploy LaTeX to PDF app
+name: Build and deploy Resume Lab
 
 on:
   push:
     branches: [main]
     paths:
-      - "app/**"
+      - "react-app/**"
       - "resumes/**"
       - ".github/workflows/deploy-resume-app.yml"
   workflow_dispatch:
@@ -19,22 +19,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.16.0"
+          cache: npm
+          cache-dependency-path: react-app/package.json
+
+      - name: Install dependencies
+        working-directory: react-app
+        run: npm install --no-audit --no-fund
+
+      - name: Build React application
+        working-directory: react-app
+        run: npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Copy resume sources into Pages artifact
-        run: mkdir -p app/resumes && cp resumes/*.tex app/resumes/
-      - name: Upload app artifact
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./app
+          path: ./react-app/dist
+
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4

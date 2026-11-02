@@ -1,6 +1,6 @@
 # Ashish Kumar Chaudhary — Resume Collection
 
-This repository contains three ATS-friendly LaTeX resume variants and a web app to compile a selected variant into PDF.
+This repository contains three ATS-friendly LaTeX resume variants and **Resume Lab**, a React-based browser workspace for editing and compiling them.
 
 ## Resume versions
 
@@ -10,32 +10,51 @@ This repository contains three ATS-friendly LaTeX resume variants and a web app 
 | [React + .NET Full Stack](resumes/React_DotNet_FullStack.tex) | React + .NET Full Stack Developer | React, Hooks, Redux Toolkit, TypeScript, ASP.NET Core, C#, SQL Server |
 | [React + Angular + .NET Full Stack](resumes/React_Angular_DotNet_FullStack.tex) | General Full Stack Developer | Balanced React, Angular, ASP.NET Core, databases, and Azure |
 
-## LaTeX to PDF web app
+## Resume Lab — React LaTeX workspace
 
-The static web app is in the [app](app/) folder. It lets you select one of the three resume sources, send it to the Pressa hosted LaTeX compiler, preview the generated PDF, and open the PDF in a new tab.
+The React application is in [react-app](react-app/). It provides:
+
+- Three selectable resume source files in a project/file sidebar.
+- A LaTeX editor powered by CodeMirror with line numbers, syntax highlighting, and editor shortcuts.
+- Browser-local draft saving, reset-to-repository-source, and TEX download.
+- pdfLaTeX / XeLaTeX compiler selection and an in-app PDF preview with an open-in-new-tab fallback.
+- Compiler error output when Pressa returns a LaTeX or service error.
 
 ### Run locally
 
-Open app/index.html in a browser, or serve the repository root with any static file server and visit /app/.
+Requires Node.js 22.12 or newer.
+
+    cd react-app
+    npm install
+    npm run dev
+
+Open the local URL printed by Vite (the base path is /resume/). The predev script copies the three repository TEX files into the app's public templates folder.
+
+Create a production build with:
+
+    npm run build
 
 ### Publish with GitHub Pages
 
-The workflow at .github/workflows/deploy-resume-app.yml deploys the contents of app/ to GitHub Pages when changes are pushed to main.
+The workflow at .github/workflows/deploy-resume-app.yml builds react-app and deploys react-app/dist when the React app, resume sources, or workflow changes are pushed to main.
 
-After the first successful workflow run and enabling GitHub Pages with GitHub Actions as the build source in repository Settings → Pages, the app will be available at:
+The app URL is:
 
 https://ashishchaudhary66.github.io/resume/
 
-### Compilation notes
+GitHub Pages must use **GitHub Actions** as its build and deployment source in repository Settings → Pages.
 
-- The app loads the selected .tex file from this public GitHub repository and uses Pressa's online compiler (api.pressa.dev) with pdfLaTeX.
-- The compiler returns the PDF directly; the app embeds that response in a preview and provides an open-in-new-tab link.
-- This is a third-party service with usage limits. The LaTeX source is public and is sent to the compiler, so do not use this app for confidential source files.
-- Generated PDFs are created on demand and are not committed to GitHub.
-- You can also compile locally with a TeX Live installation or upload a .tex file to Overleaf.
+### Compiler and storage notes
+
+- Compilation sends the current editor contents to Pressa's POST /api/v1/compile endpoint. Unsaved edits are therefore compiled too.
+- Pressa is a third-party service. Its API has anonymous usage, source-size, page-count, and output-size limits. Check its current [API documentation](https://pressa.dev/docs/api) for details.
+- Browser drafts are stored in localStorage on the current browser/device. They are not synced to GitHub or another device.
+- The React app is static-hosted. It does not provide authentication, cloud projects, multi-user collaboration, or server-side storage yet.
+- Do not enter confidential documents or secrets into this public app. LaTeX source is sent to the hosted compiler.
+- PDF URLs returned by Pressa are temporary signed links.
 
 ## Notes
 
-- Keep dates, contact details, metrics, and technology claims aligned with your verified employment history.
-- The source files use a compact A4 layout intended to fit on one page. Confirm the final page count after compiling with your LaTeX distribution.
+- Keep dates, contact details, metrics, and technology claims aligned with verified employment history.
+- The source files use a compact A4 layout intended to fit on one page. Confirm the final page count after compiling.
 - Update the relevant variant rather than sending the same resume to every role.

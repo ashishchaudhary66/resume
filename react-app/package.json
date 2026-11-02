@@ -1,0 +1,25 @@
+{
+  "name": "resume-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "copy:templates": "node scripts/copy-resumes.mjs",
+    "predev": "npm run copy:templates",
+    "dev": "vite",
+    "prebuild": "npm run copy:templates",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/language": "6.13.1",
+    "@codemirror/legacy-modes": "6.5.3",
+    "@uiw/react-codemirror": "4.25.12",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.1.2",
+    "vite": "8.3.5"
+  }
+}
