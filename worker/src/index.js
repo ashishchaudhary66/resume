@@ -30,12 +30,30 @@ function jsonResponse(payload, status, origin) {
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
     const origin = request.headers.get("Origin") || "";
+
+    // Public, read-only health check for opening the Worker URL directly.
+    // Compilation itself remains restricted to the allowlisted app origins.
+    if (url.pathname === "/" && request.method === "GET") {
+      return new Response(JSON.stringify({
+        ok: true,
+        service: "Resume Lab compiler proxy",
+        endpoint: "/compile",
+        allowedAppOrigin: "https://ashishchaudhary66.github.io"
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store"
+        }
+      });
+    }
+
     if (!ALLOWED_ORIGINS.has(origin)) {
       return new Response("Origin not allowed.", { status: 403 });
     }
 
-    const url = new URL(request.url);
     if (url.pathname !== "/compile") {
       return jsonResponse({ error: "not_found", message: "Use POST /compile." }, 404, origin);
     }
