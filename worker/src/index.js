@@ -65,7 +65,7 @@ export default {
       const validPdfUrl =
         pdfUrl.protocol === "https:" &&
         pdfUrl.hostname === "api.pressa.dev" &&
-        /^\\/api\\/v1\\/pdfs\\/[a-zA-Z0-9_-]+$/.test(pdfUrl.pathname) &&
+        /^\/api\/v1\/pdfs\/[a-zA-Z0-9_-]+$/.test(pdfUrl.pathname) &&
         pdfUrl.searchParams.has("sig") &&
         pdfUrl.searchParams.has("exp");
 
@@ -173,7 +173,7 @@ export default {
             const validPdfUrl =
               signedPdfUrl.protocol === "https:" &&
               signedPdfUrl.hostname === "api.pressa.dev" &&
-              /^\\/api\\/v1\\/pdfs\\/[a-zA-Z0-9_-]+$/.test(signedPdfUrl.pathname) &&
+              /^\/api\/v1\/pdfs\/[a-zA-Z0-9_-]+$/.test(signedPdfUrl.pathname) &&
               signedPdfUrl.searchParams.has("sig") &&
               signedPdfUrl.searchParams.has("exp");
 
