@@ -43,7 +43,7 @@ Pressa's compile API does not currently return the CORS headers required by a br
 1. Create or sign in to a Cloudflare account and enable Workers.
 2. In GitHub, open this repository's **Settings → Secrets and variables → Actions**.
 3. Add `CLOUDFLARE_API_TOKEN` (an API token with permission to edit Workers Scripts for the account) and `CLOUDFLARE_ACCOUNT_ID`.
-4. Push a change under `worker/` or manually run **Deploy Resume Lab compiler proxy** from the Actions tab. The workflow deploys `worker/src/index.js` using `worker/wrangler.jsonc`.
+4. Push a change under `worker/` or manually run **Deploy Resume Lab compiler proxy** from the Actions tab. The workflow deploys `worker/src/index.js` using `worker/wrangler.jsonc`. The workflow requires both secrets and fails with a clear message when they are missing.
 5. In Cloudflare, confirm that the Worker `resume-lab-compiler` has a `workers.dev` URL enabled. It will look like `https://resume-lab-compiler.<your-workers-subdomain>.workers.dev`.
 6. Open Resume Lab, click **Set proxy URL**, and paste the Worker URL. The setting is saved in localStorage for that browser.
 
