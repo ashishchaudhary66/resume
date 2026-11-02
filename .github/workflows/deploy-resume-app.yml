@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "app/**"
+      - "resumes/**"
       - ".github/workflows/deploy-resume-app.yml"
   workflow_dispatch:
 
@@ -28,6 +29,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+      - name: Copy resume sources into Pages artifact
+        run: mkdir -p app/resumes && cp resumes/*.tex app/resumes/
       - name: Upload app artifact
         uses: actions/upload-pages-artifact@v3
         with:
