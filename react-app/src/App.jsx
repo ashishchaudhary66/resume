@@ -113,7 +113,7 @@ function App() {
     );
     if (entered === null) return;
 
-    const value = entered.trim().replace(/\\/+$/, "");
+    const value = entered.trim().replace(/\/+$/, "");
     if (!value) {
       try { window.localStorage.removeItem("resume-lab:compiler-proxy-url"); } catch { /* storage unavailable */ }
       setCompilerProxyUrl("");
@@ -134,7 +134,7 @@ function App() {
       return;
     }
 
-    const normalized = parsed.origin + parsed.pathname.replace(/\\/+$/, "");
+    const normalized = parsed.origin + parsed.pathname.replace(/\/+$/, "");
     try {
       window.localStorage.setItem("resume-lab:compiler-proxy-url", normalized);
     } catch {
